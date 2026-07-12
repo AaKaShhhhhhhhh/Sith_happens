@@ -9,4 +9,4 @@ Drop the generated pixel-art PNGs here (transparent background):
 The app loads these automatically. Until they exist, each suspect shows a
 colored placeholder with an emoji — no code change needed once you add them.
 
-See `~/midnight-deploy-sprite-prompts.md` for the generation prompts.
+See `~/inside-out-sprite-prompts.md` for the generation prompts.

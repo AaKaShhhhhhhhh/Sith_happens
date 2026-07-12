@@ -78,6 +78,10 @@
     letter-spacing: 1px;
     text-shadow: 3px 3px 0 rgba(0, 0, 0, 0.35);
   }
+  .font-ui {
+    font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto,
+      Helvetica, Arial, sans-serif;
+  }
 
   /* --- scenes (route backgrounds) --- */
   .scene-day {

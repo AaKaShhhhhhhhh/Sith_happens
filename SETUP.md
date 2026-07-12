@@ -1,4 +1,4 @@
-# The Midnight Deploy — setup & run
+# Inside Out — setup & run
 
 A Jackbox-style browser murder mystery. React + Vite + Tailwind on the front,
 **Supabase** (Postgres + realtime) as the backend, deployed on **Cloudflare Pages**,
@@ -89,7 +89,7 @@ suspect-intern.png
 suspect-senior_dev.png
 ```
 
-Prompts are in `~/midnight-deploy-sprite-prompts.md`. Until they exist, suspects show
+Prompts are in `~/inside-out-sprite-prompts.md`. Until they exist, suspects show
 styled emoji placeholders — no code change needed.
 
 ## 5. Suspect voices — ElevenLabs (power-up)
@@ -114,7 +114,7 @@ Option A — dashboard:
 Option B — Wrangler:
 ```bash
 pnpm build
-npx wrangler pages deploy dist --project-name midnight-deploy
+npx wrangler pages deploy dist --project-name inside-out
 ```
 
 Enable **Cloudflare Web Analytics** on the Pages project for the Visitors metric

@@ -39,8 +39,8 @@ export function VerdictCard({
       void trackEvent('verdict_generated', room.id, me.id)
       const res = await shareOrDownload(
         dataUrl,
-        'midnight-deploy.png',
-        'I just played The Midnight Deploy 🕵️ — someone wiped prod at 2 AM. Can your group catch the culprit?',
+        'inside-out.png',
+        'I just played Inside Out 🕵️ — someone wiped prod at 2 AM. Can your group catch the culprit?',
       )
       void trackEvent('verdict_shared', room.id, me.id, { via: res })
       void markVerdictShared(me.id)
@@ -56,7 +56,7 @@ export function VerdictCard({
     <div className="flex flex-col items-center gap-4">
       {/* the exported card */}
       <div ref={cardRef} className="panel w-80 !bg-cream">
-        <p className="font-display text-center text-xs text-orange">THE MIDNIGHT DEPLOY</p>
+        <p className="font-display text-center text-xs text-orange">INSIDE OUT</p>
         <p className="font-body mt-1 text-center text-lg text-ink/60">
           Someone wiped prod at 2 AM.
         </p>
