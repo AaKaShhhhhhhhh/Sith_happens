@@ -1,6 +1,6 @@
-# The Midnight Deploy
+# Inside Out
 
-**The Midnight Deploy** is a Jackbox-style browser party game for builders and startup teams.
+**Inside Out** is a Jackbox-style browser party game for builders and startup teams.
 
 The premise is simple: **someone wiped the production database at 2 AM.**
 A group of players joins from their phones, receives secret roles, interrogates AI-powered suspects, drops clues, votes on the culprit, and then gets a dramatic reveal showing whether the group caught the real culprit or got fooled by the secret Mole.
@@ -38,7 +38,7 @@ This project is built for the **GrowthX Hermes Buildathon** with **Virality** as
 
 ## Project Summary
 
-**The Midnight Deploy** is a social browser game where:
+**Inside Out** is a social browser game where:
 
 1. One host creates a game room on a laptop.
 2. Players join from their phones using a QR code or room link.
@@ -707,7 +707,7 @@ Stores shareable verdict card metadata.
 Recommended structure:
 
 ```text
-midnight-deploy/
+inside-out/
 ├── README.md
 ├── package.json
 ├── vite.config.ts
@@ -772,8 +772,8 @@ cd growthx-hermes-buildathon
 ### 2. Create Vite app
 
 ```bash
-npm create vite@latest midnight-deploy -- --template react-ts
-cd midnight-deploy
+npm create vite@latest inside-out -- --template react-ts
+cd inside-out
 ```
 
 ### 3. Install dependencies
@@ -1297,7 +1297,7 @@ Option 2: Wrangler
 
 ```bash
 npm install -g wrangler
-wrangler pages deploy dist --project-name midnight-deploy
+wrangler pages deploy dist --project-name inside-out
 ```
 
 ---
@@ -1425,7 +1425,7 @@ After MVP:
 ## One-Line Pitch
 
 ```text
-The Midnight Deploy is a Jackbox-style murder mystery for builders: someone wiped prod at 2 AM, three AI suspects are lying, and one friend is secretly the Mole trying to frame the wrong person.
+Inside Out is a Jackbox-style murder mystery for builders: someone wiped prod at 2 AM, three AI suspects are lying, and one friend is secretly the Mole trying to frame the wrong person.
 ```
 
 ---

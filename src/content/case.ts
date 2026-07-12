@@ -1,4 +1,4 @@
-// "The Midnight Deploy" — the one authored case.
+// "Inside Out" — the one authored case.
 // The guilty suspect is chosen at random each game; clues + witness line adapt
 // to whoever is guilty so the mystery stays coherent.
 

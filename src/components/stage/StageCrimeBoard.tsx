@@ -73,7 +73,7 @@ export function StageCrimeBoard({
     return (
       <div className="flex w-full max-w-3xl flex-1 flex-col items-center justify-center gap-6">
         {header}
-        <h1 className="h-title text-2xl text-danger">THE MIDNIGHT DEPLOY</h1>
+        <h1 className="h-title text-2xl text-danger">INSIDE OUT</h1>
         <div className="panel max-w-xl text-center">
           {CASE_INTRO.map((line, i) => (
             <p key={i} className="font-body text-2xl leading-snug">
