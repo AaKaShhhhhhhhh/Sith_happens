@@ -7,6 +7,10 @@ A group of players joins from their phones, receives secret roles, interrogates 
 
 This project is built for the **GrowthX Hermes Buildathon** with **Virality** as the main track.
 
+> ⚡ **To run it, see [SETUP.md](SETUP.md).** The backend is implemented on **Supabase**
+> (Postgres + realtime), not Convex as some sections below describe. The rest of this
+> document is the original design spec.
+
 ---
 
 ## Table of Contents
