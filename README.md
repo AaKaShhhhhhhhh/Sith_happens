@@ -5,7 +5,7 @@
 The premise is simple: **someone wiped the production database at 2 AM.**
 A group of players joins from their phones, receives secret roles, interrogates AI-powered suspects, drops clues, votes on the culprit, and then gets a dramatic reveal showing whether the group caught the real culprit or got fooled by the secret Mole.
 
-This project is built for the **GrowthX Hermes Buildathon** with **Virality** as the main track.
+This project is built for the **Hermes Buildathon Gurugram 2026** with **Virality** as the main track.
 
 > ⚡ **To run it, see [SETUP.md](SETUP.md).** The backend is implemented on **Supabase**
 > (Postgres + realtime), not Convex as some sections below describe. The rest of this
@@ -90,8 +90,8 @@ Each real player who joins with name/email, receives a role, votes, and gets a v
 
 The project can also claim power-up points through:
 
-- **Convex** — realtime game state and database
-- **Cloudflare Pages** — public deployment
+- **Supabase** — Postgres database, backend storage, realtime-ready tables
+- **Vercel** — public deployment
 - **ElevenLabs** — AI suspect voices
 - **Hermes** — coding partner and/or game-master content generation
 
@@ -103,7 +103,7 @@ The project can also claim power-up points through:
 
 1. Host opens the landing page.
 2. Host clicks **Create Room**.
-3. App creates a room in Convex.
+3. App creates a room in Supabase.
 4. Host is redirected to the stage screen.
 5. Stage screen displays:
    - room code
@@ -170,16 +170,21 @@ Landing
 
 ### Backend
 
-- **Convex**
-  - realtime database
-  - queries
-  - mutations
+- **Supabase**
+  - Postgres database only
+  - SQL migrations
   - game state
   - room/player/vote/event storage
+- **Cloudflare Access**
+  - authentication layer
+  - forwards verified user identity to backend routes
+  - protects the app/API before Supabase is called
 
 ### Hosting
 
-- **Cloudflare Pages**
+- **Vercel**
+  - deploys frontend and backend API routes in one project
+  - runs `api/[...path].ts` as the serverless backend
 
 ### Optional / Stretch
 
@@ -200,19 +205,19 @@ Players and Host
       |
       | Browser
       v
-Cloudflare Pages
+Vercel
       |
-      | serves static React app
+      | serves React frontend and /api serverless functions
       v
 React + TypeScript Frontend
       |
-      | Convex hooks
+      | Cloudflare Access authenticates user before API work
       v
-Convex Backend
+Vercel serverless API routes protected by Cloudflare Access
       |
-      | stores realtime state
+      | service-role database calls
       v
-Convex Database
+Supabase Postgres Database
 
 Optional:
 React Frontend -> Analytics Provider
@@ -339,9 +344,9 @@ Responsibilities:
 
 ## Backend Workflow
 
-The backend is powered by **Convex**.
+The backend uses **Supabase as the database only** and **Cloudflare Access for authentication**.
 
-Convex handles:
+Supabase handles:
 
 - room creation
 - player joining
@@ -358,17 +363,23 @@ Convex handles:
 
 ### Backend modules
 
-Recommended Convex files:
+Recommended backend files:
 
 ```text
-convex/
-├── schema.ts
-├── rooms.ts
-├── players.ts
-├── votes.ts
-├── events.ts
-├── interrogations.ts
-└── case.ts
+api/
+└── [...path].ts
+src/
+├── authenticatedBackend.ts
+├── backend.ts
+├── cloudflareAuth.ts
+├── http.ts
+├── supabaseClient.ts
+├── gameLogic.ts
+├── case.ts
+└── database.types.ts
+supabase/
+└── migrations/
+    └── 20260712135400_initial_midnight_deploy.sql
 ```
 
 ---
@@ -700,6 +711,26 @@ Stores shareable verdict card metadata.
 /room/:roomCode/player/:playerId       Player private screen
 ```
 
+### Backend API routes on Vercel
+
+The frontend should call these same-origin routes after Cloudflare Access authenticates the request:
+
+```text
+POST /api/rooms                         create room
+GET  /api/rooms/:roomCode               get room by code
+POST /api/players/join                  join room
+GET  /api/rooms/:roomId/players         list players
+POST /api/rooms/:roomId/start           start game
+POST /api/rooms/:roomId/phase           advance phase
+POST /api/rooms/:roomId/clues/reveal    reveal next clue
+POST /api/interrogations                ask preset suspect question
+POST /api/votes                         cast/update vote
+GET  /api/rooms/:roomId/votes/summary   vote summary
+GET  /api/rooms/:roomId/reveal          reveal calculation
+POST /api/verdict-cards                 create verdict card metadata
+POST /api/verdict-cards/:cardId/share   mark verdict shared
+```
+
 ---
 
 ## Directory Structure
@@ -749,14 +780,20 @@ midnight-deploy/
 │   │   ├── time.ts
 │   │   └── share.ts
 │   └── styles.css
-└── convex/
-    ├── schema.ts
-    ├── rooms.ts
-    ├── players.ts
-    ├── votes.ts
-    ├── events.ts
-    ├── interrogations.ts
-    └── case.ts
+├── api/
+│   └── [...path].ts
+├── src/
+│   ├── authenticatedBackend.ts
+│   ├── backend.ts
+│   ├── cloudflareAuth.ts
+│   ├── http.ts
+│   ├── supabaseClient.ts
+│   ├── gameLogic.ts
+│   ├── case.ts
+│   └── database.types.ts
+└── supabase/
+    └── migrations/
+        └── 20260712135400_initial_midnight_deploy.sql
 ```
 
 ---
@@ -780,7 +817,7 @@ cd midnight-deploy
 
 ```bash
 npm install
-npm install convex react-router-dom qrcode.react clsx lucide-react html-to-image
+npm install react-router-dom qrcode.react clsx lucide-react html-to-image
 npm install -D tailwindcss postcss autoprefixer
 ```
 
@@ -790,10 +827,10 @@ npm install -D tailwindcss postcss autoprefixer
 npx tailwindcss init -p
 ```
 
-### 5. Initialize Convex
+### 5. Initialize Supabase
 
 ```bash
-npx convex dev
+supabase start
 ```
 
 ### 6. Start frontend dev server
@@ -809,8 +846,18 @@ npm run dev
 Create a `.env.local` file if needed.
 
 ```env
-# Convex
-VITE_CONVEX_URL=
+# Supabase database only; set in Vercel Project Settings > Environment Variables.
+# Server-side only. Never expose the service role key in frontend code.
+SUPABASE_URL=
+SUPABASE_SERVICE_ROLE_KEY=
+
+# Cloudflare Access auth in front of the Vercel app/API.
+CLOUDFLARE_TEAM_DOMAIN=
+CLOUDFLARE_ACCESS_AUD=
+
+# Optional only if backend automation calls Cloudflare APIs.
+CLOUDFLARE_ACCOUNT_ID=
+CLOUDFLARE_API_TOKEN=
 
 # Optional analytics
 VITE_POSTHOG_KEY=
@@ -838,10 +885,16 @@ That avoids live API latency during the demo.
 npm run dev
 ```
 
-### Run Convex backend
+### Run Supabase locally
 
 ```bash
-npx convex dev
+supabase start
+```
+
+### Run Vercel API routes locally
+
+```bash
+npm run vercel:dev
 ```
 
 ### Build production app
@@ -856,10 +909,10 @@ npm run build
 npm run preview
 ```
 
-### Deploy Convex
+### Deploy Supabase migrations
 
 ```bash
-npx convex deploy
+supabase db push
 ```
 
 ---
@@ -1223,9 +1276,9 @@ This is stronger than counting simple page visits.
 
 Proof comes from:
 
-- Convex `players` table
-- Convex `votes` table
-- Convex `events` table
+- Supabase `players` table
+- Supabase `votes` table
+- Supabase `events` table
 - analytics dashboard
 - social post links
 - room timestamps
@@ -1254,7 +1307,7 @@ Keep a proof log during the hack:
 ```text
 - Live app URL
 - Analytics dashboard
-- Convex dashboard
+- Supabase dashboard
 - Number of rooms created
 - Number of players joined
 - Number of votes cast
@@ -1275,29 +1328,31 @@ Keep a proof log during the hack:
 npm run build
 ```
 
-### Deploy to Cloudflare Pages
+### Deploy to Vercel
 
-Option 1: Cloudflare dashboard
+The frontend and backend deploy together on Vercel. Backend requests go to `/api/*`; frontend code should call these same-origin API routes for game writes instead of calling Supabase directly.
 
-1. Connect GitHub repo.
-2. Select project.
-3. Build command:
+Option 1: Vercel dashboard
+
+1. Connect the GitHub repo.
+2. Select the project.
+3. Add the required environment variables in **Project Settings → Environment Variables**.
+4. Build command:
 
 ```bash
 npm run build
 ```
 
-4. Output directory:
+5. Output directory when the Vite frontend is added:
 
 ```text
 dist
 ```
 
-Option 2: Wrangler
+Option 2: Vercel CLI
 
 ```bash
-npm install -g wrangler
-wrangler pages deploy dist --project-name midnight-deploy
+npx vercel --prod
 ```
 
 ---
@@ -1317,7 +1372,7 @@ The MVP must include:
 - player voting
 - reveal sequence
 - verdict card
-- Convex event tracking
+- Supabase event tracking
 - deployed public URL
 
 ---
@@ -1343,9 +1398,9 @@ Do **not** build these before the MVP works:
 ```text
 1. Create Vite + React app
 2. Set up Tailwind
-3. Set up Convex
+3. Set up Supabase
 4. Add routes
-5. Create Convex schema
+5. Create Supabase schema/migration
 6. Implement room creation
 7. Implement player joining
 8. Implement live lobby
@@ -1380,7 +1435,7 @@ During judging:
 9. Vote.
 10. Show dramatic reveal.
 11. Show verdict card.
-12. Open Convex dashboard.
+12. Open Supabase dashboard.
 13. Show player/action records.
 14. Open analytics dashboard.
 15. Show Hermes session receipts.
@@ -1398,7 +1453,7 @@ For hackathon scoring, success means:
 - verdict cards are generated/shared
 - social clips/posts exist
 - analytics shows visitors
-- Convex shows real timestamps
+- Supabase shows real timestamps
 - judges can verify everything live
 
 ---
@@ -1432,4 +1487,4 @@ The Midnight Deploy is a Jackbox-style murder mystery for builders: someone wipe
 
 ## License
 
-Built for the GrowthX Hermes Buildathon.
+Built for the Hermes Buildathon Gurugram 2026.

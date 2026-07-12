@@ -98,8 +98,6 @@ create index if not exists events_type_idx on events(type, created_at desc);
 create index if not exists verdict_cards_room_idx on verdict_cards(room_id);
 create index if not exists verdict_cards_player_idx on verdict_cards(player_id);
 
--- Realtime tables. Supabase may error if a table is already in the publication;
--- ignore duplicate_object so db reset/push can be re-run.
 do $$
 begin
   alter publication supabase_realtime add table rooms;
