@@ -100,10 +100,7 @@ export default function Landing() {
         <div className="absolute inset-0 bg-gradient-to-b from-night/60 via-night/85 to-night" />
         <div className="relative mx-auto grid max-w-6xl items-center gap-10 px-5 py-16 md:grid-cols-2 md:py-24">
           <div>
-            <span className="inline-block rounded-full border border-orange/40 bg-orange/10 px-3 py-1 text-xs font-semibold text-orange">
-              🎉 A party game for builders
-            </span>
-            <h1 className="mt-5 text-4xl font-extrabold leading-[1.05] sm:text-6xl">
+            <h1 className="text-4xl font-extrabold leading-[1.05] sm:text-6xl">
               Someone wiped{' '}
               <span className="text-danger">prod</span> at{' '}
               <span className="text-orange">2 AM.</span>
