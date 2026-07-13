@@ -127,7 +127,7 @@ export default function Landing() {
                   onKeyDown={(e) => e.key === 'Enter' && joinGame()}
                   placeholder="ROOM CODE"
                   maxLength={6}
-                  className="w-32 bg-transparent px-4 py-3.5 text-base tracking-widest outline-none placeholder:text-white/40"
+                  className="w-36 bg-transparent px-4 py-3.5 text-base tracking-wider outline-none placeholder:tracking-normal placeholder:text-white/40"
                 />
                 <button
                   onClick={joinGame}
