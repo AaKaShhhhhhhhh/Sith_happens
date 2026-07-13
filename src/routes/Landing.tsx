@@ -9,9 +9,43 @@ import {
   Search,
   Ghost,
   Eye,
+  Briefcase,
+  Fingerprint,
 } from 'lucide-react'
 import { createRoom } from '../lib/game'
 import { SUSPECTS } from '../content/case'
+
+// per-suspect accent theming for the case-file cards (full literal
+// class strings so Tailwind can statically detect them)
+const SUSPECT_META = [
+  {
+    num: '01',
+    hoverBorder: 'hover:border-orange/50',
+    glow: 'bg-orange/40',
+    tag: 'bg-orange/15 text-orange',
+    grad: 'from-orange/15',
+    name: 'text-orange',
+    quote: 'border-orange/60',
+  },
+  {
+    num: '02',
+    hoverBorder: 'hover:border-sky/50',
+    glow: 'bg-sky/40',
+    tag: 'bg-sky/15 text-sky',
+    grad: 'from-sky/15',
+    name: 'text-sky',
+    quote: 'border-sky/60',
+  },
+  {
+    num: '03',
+    hoverBorder: 'hover:border-danger/50',
+    glow: 'bg-danger/40',
+    tag: 'bg-danger/15 text-danger',
+    grad: 'from-danger/15',
+    name: 'text-danger',
+    quote: 'border-danger/60',
+  },
+] as const
 
 export default function Landing() {
   const navigate = useNavigate()
@@ -141,63 +175,129 @@ export default function Landing() {
 
       {/* ---------- suspects ---------- */}
       <section className="mx-auto max-w-6xl px-5 py-16">
-        <h2 className="text-center text-3xl font-extrabold sm:text-4xl">
+        <p className="flex items-center justify-center gap-2 text-center font-display text-[0.6rem] tracking-widest text-orange/70">
+          <Fingerprint className="h-3.5 w-3.5" />
+          CASE FILE · 3 SUSPECTS
+        </p>
+        <h2 className="mt-4 text-center text-3xl font-extrabold sm:text-4xl">
           Meet the suspects
         </h2>
         <p className="mx-auto mt-3 max-w-lg text-center text-white/60">
           Grill them from your phone. They answer out loud — and the guilty one always
           slips up.
         </p>
-        <div className="mt-10 grid gap-6 sm:grid-cols-3">
-          {SUSPECTS.map((s) => (
-            <div
-              key={s.id}
-              className="rounded-2xl border border-white/10 bg-white/5 p-6 text-center transition hover:-translate-y-1 hover:border-orange/40"
-            >
-              <img
-                src={`/sprites/suspect-${s.id}.png`}
-                alt={s.name}
-                className="mx-auto h-40 w-40 object-contain"
-                style={{ imageRendering: 'pixelated' }}
-              />
-              <h3 className="font-display mt-3 text-sm text-orange">{s.name}</h3>
-              <p className="mt-1 text-sm text-white/40">{s.title}</p>
-              <p className="mt-3 text-white/70">{s.blurb}</p>
-            </div>
-          ))}
+        <div className="mt-12 grid gap-6 sm:grid-cols-3">
+          {SUSPECTS.map((s, i) => {
+            const m = SUSPECT_META[i] ?? SUSPECT_META[0]
+            return (
+              <div
+                key={s.id}
+                className={`group relative overflow-hidden rounded-2xl border border-white/10 bg-night-2/50 transition duration-300 hover:-translate-y-1.5 ${m.hoverBorder}`}
+              >
+                {/* accent glow on hover */}
+                <div
+                  className={`pointer-events-none absolute -top-20 left-1/2 h-44 w-44 -translate-x-1/2 rounded-full blur-3xl transition duration-500 group-hover:opacity-100 ${m.glow} opacity-0`}
+                />
+
+                {/* file header */}
+                <div className="relative flex items-center justify-between border-b border-white/10 px-4 py-2.5">
+                  <span className="font-display text-[0.55rem] text-white/40">
+                    SUSPECT #{m.num}
+                  </span>
+                  <span
+                    className={`rounded-full px-2 py-1 font-display text-[0.5rem] leading-none ${m.tag}`}
+                  >
+                    PERSON OF INTEREST
+                  </span>
+                </div>
+
+                {/* portrait — framed so it no longer floats */}
+                <div
+                  className={`relative flex justify-center overflow-hidden bg-gradient-to-b to-transparent py-6 ${m.grad}`}
+                >
+                  <div
+                    className="absolute inset-0 opacity-[0.18]"
+                    style={{
+                      backgroundImage:
+                        'linear-gradient(rgba(255,255,255,0.6) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.6) 1px, transparent 1px)',
+                      backgroundSize: '22px 22px',
+                    }}
+                  />
+                  <img
+                    src={`/sprites/suspect-${s.id}.png`}
+                    alt={s.name}
+                    className="relative h-40 w-40 object-contain drop-shadow-[0_10px_22px_rgba(0,0,0,0.65)] transition duration-300 group-hover:scale-[1.04]"
+                    style={{ imageRendering: 'pixelated' }}
+                  />
+                </div>
+
+                {/* dossier body */}
+                <div className="relative px-5 pb-6 pt-4">
+                  <h3 className={`font-display text-sm ${m.name}`}>{s.name}</h3>
+                  <p className="mt-2 flex items-center gap-1.5 text-xs uppercase tracking-wide text-white/40">
+                    <Briefcase className="h-3.5 w-3.5" />
+                    {s.title}
+                  </p>
+                  <p
+                    className={`mt-4 border-l-2 pl-3 text-sm italic text-white/70 ${m.quote}`}
+                  >
+                    “{s.blurb}”
+                  </p>
+                </div>
+              </div>
+            )
+          })}
         </div>
       </section>
 
       {/* ---------- how it works ---------- */}
       <section className="border-y border-white/10 bg-white/[0.03]">
         <div className="mx-auto max-w-6xl px-5 py-16">
-          <h2 className="text-center text-3xl font-extrabold sm:text-4xl">
+          <p className="text-center font-display text-[0.6rem] tracking-widest text-orange/70">
+            THE PLAYBOOK
+          </p>
+          <h2 className="mt-4 text-center text-3xl font-extrabold sm:text-4xl">
             How it works
           </h2>
-          <div className="mt-10 grid gap-6 sm:grid-cols-3">
+          <div className="mt-12 grid gap-6 sm:grid-cols-3">
             {[
               {
                 icon: Users,
+                step: '01',
                 title: 'Join from your phone',
                 body: 'Host opens the game on a laptop. Everyone scans the QR and gets a secret role in a private DM.',
               },
               {
                 icon: MessageSquare,
+                step: '02',
                 title: 'Interrogate & argue',
                 body: 'Question the suspects out loud, read the clues, and figure out who wiped prod — while the mole misleads you.',
               },
               {
                 icon: Gavel,
+                step: '03',
                 title: 'Vote & get played',
                 body: 'The timer forces a vote. Then the reveal: the real culprit, and the mole who’s been steering you wrong.',
               },
-            ].map((step, i) => (
-              <div key={i} className="rounded-2xl border border-white/10 bg-night p-6">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange/15 text-orange">
-                  <step.icon className="h-6 w-6" />
+            ].map((step) => (
+              <div
+                key={step.step}
+                className="group relative overflow-hidden rounded-2xl border border-white/10 bg-night p-6 transition duration-300 hover:-translate-y-1.5 hover:border-orange/40"
+              >
+                {/* oversized step number watermark */}
+                <span className="pointer-events-none absolute -right-2 -top-5 font-display text-6xl leading-none text-white/[0.04] transition group-hover:text-orange/10">
+                  {step.step}
+                </span>
+                <div className="relative flex items-center gap-3">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange/15 text-orange ring-1 ring-inset ring-orange/25 transition group-hover:bg-orange/25">
+                    <step.icon className="h-6 w-6" />
+                  </div>
+                  <span className="font-display text-[0.6rem] text-white/30">
+                    STEP {step.step}
+                  </span>
                 </div>
-                <h3 className="mt-4 text-xl font-bold">{step.title}</h3>
-                <p className="mt-2 text-white/60">{step.body}</p>
+                <h3 className="relative mt-4 text-xl font-bold">{step.title}</h3>
+                <p className="relative mt-2 text-white/60">{step.body}</p>
               </div>
             ))}
           </div>
@@ -206,40 +306,73 @@ export default function Landing() {
 
       {/* ---------- roles ---------- */}
       <section className="mx-auto max-w-6xl px-5 py-16">
-        <h2 className="text-center text-3xl font-extrabold sm:text-4xl">
+        <p className="text-center font-display text-[0.6rem] tracking-widest text-orange/70">
+          DRAWN AT RANDOM
+        </p>
+        <h2 className="mt-4 text-center text-3xl font-extrabold sm:text-4xl">
           Everyone gets a secret role
         </h2>
-        <div className="mt-10 grid gap-6 sm:grid-cols-3">
+        <p className="mx-auto mt-3 max-w-lg text-center text-white/60">
+          Your role lands in a private DM. Nobody knows who’s who — that’s the whole game.
+        </p>
+        <div className="mt-12 grid gap-6 sm:grid-cols-3">
           {[
             {
               icon: Search,
               color: '#5fbf4f',
               name: 'Investigator',
-              body: 'Most players. Catch the real culprit before the clock runs out.',
+              tag: 'GOOD',
+              rarity: 'Most players',
+              body: 'Catch the real culprit before the clock runs out.',
             },
             {
               icon: Ghost,
               color: '#e23b3b',
               name: 'The Mole',
-              body: 'One player. You know who did it — your job is to make the group blame the wrong person.',
+              tag: 'SECRET',
+              rarity: 'One player',
+              body: 'You know who did it — your job is to make the group blame the wrong person.',
             },
             {
               icon: Eye,
               color: '#3f8fd6',
               name: 'The Witness',
+              tag: 'WILDCARD',
+              rarity: 'One player',
               body: 'You saw one true clue. Drop it at the right moment — if they believe you.',
             },
           ].map((r) => (
             <div
               key={r.name}
-              className="rounded-2xl border p-6"
+              className="group relative overflow-hidden rounded-2xl border p-6 transition duration-300 hover:-translate-y-1.5"
               style={{ borderColor: `${r.color}55`, background: `${r.color}12` }}
             >
-              <r.icon className="h-8 w-8" style={{ color: r.color }} />
-              <h3 className="font-display mt-4 text-sm" style={{ color: r.color }}>
+              {/* accent glow on hover */}
+              <div
+                className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full opacity-0 blur-3xl transition duration-500 group-hover:opacity-100"
+                style={{ background: `${r.color}55` }}
+              />
+              <div className="relative flex items-center justify-between">
+                <div
+                  className="flex h-12 w-12 items-center justify-center rounded-xl ring-1 ring-inset"
+                  style={{ background: `${r.color}1f`, color: r.color, borderColor: `${r.color}55` }}
+                >
+                  <r.icon className="h-6 w-6" />
+                </div>
+                <span
+                  className="rounded-full px-2 py-1 font-display text-[0.5rem] leading-none"
+                  style={{ background: `${r.color}22`, color: r.color }}
+                >
+                  {r.tag}
+                </span>
+              </div>
+              <h3 className="font-display relative mt-4 text-sm" style={{ color: r.color }}>
                 {r.name}
               </h3>
-              <p className="mt-3 text-white/70">{r.body}</p>
+              <p className="relative mt-1 text-xs uppercase tracking-wide text-white/40">
+                {r.rarity}
+              </p>
+              <p className="relative mt-3 text-white/70">{r.body}</p>
             </div>
           ))}
         </div>
